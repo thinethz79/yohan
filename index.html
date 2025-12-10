@@ -124,6 +124,7 @@
         const provider = new GoogleAuthProvider();
 
         window.currentUserData = null;
+        let pendingCheckout = false; // Flag to track checkout attempt
 
         window.loginWithGoogle = async () => {
             try {
@@ -144,6 +145,15 @@
         onAuthStateChanged(auth, (user) => {
             window.currentUserData = user;
             updateAuthUI(user);
+            
+            // Redirect to Checkout if pending
+            if (user && pendingCheckout) {
+                pendingCheckout = false; // Reset flag
+                showToast("Login successful! Resuming checkout...");
+                setTimeout(() => {
+                    checkout(); // Re-trigger checkout
+                }, 800); // Slight delay for smoother UX
+            }
         });
 
         function updateAuthUI(user) {
@@ -714,10 +724,11 @@
         window.checkout = function() {
             // Require Login for Purchase
             if (!window.currentUserData) {
+                pendingCheckout = true; // Set pending flag
                 closeCartModal();
                 setTimeout(() => {
                     openLoginModal();
-                    showToast("Please login to purchase items");
+                    showToast("Please login to complete your purchase");
                 }, 300);
                 return;
             }
