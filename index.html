@@ -1,121 +1,808 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>406 Not Acceptable - Handover Failed</title>
+    <title>YOHAN H4X YT - Android & iOS Panel Store</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6', // Blue 500
+                        secondary: '#06b6d4', // Cyan 500
+                        dark: '#020617', // Slate 950 (Deep Blue/Black)
+                        light: '#f8fafc', // Slate 50
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Courier New', 'monospace'],
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
 
-        body {
-            font-family: 'Inter', sans-serif;
+        body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
+
+        /* --- Animations --- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        .mono {
-            font-family: 'JetBrains Mono', monospace;
+        /* Glassmorphism */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+        .dark .glass-card {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px -10px rgba(59, 130, 246, 0.3);
         }
 
-        /* Subtle noise texture for background */
-        .bg-noise {
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+        /* Loading Dots */
+        .loading-dots:after {
+            content: '.';
+            animation: dots 1.5s steps(5, end) infinite;
         }
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60% { content: '...'; }
+            80%, 100% { content: ''; }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .dark ::-webkit-scrollbar-thumb { background: #334155; }
+        ::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 h-screen flex flex-col relative overflow-hidden bg-noise">
+<body class="bg-light text-slate-800 dark:bg-dark dark:text-gray-100 transition-colors duration-300 relative">
+    <script id="dsq-count-scr" src="//yohanh4xnetlifyapp.disqus.com/count.js" async></script>
 
-    <!-- Top decorative bar -->
-    <div class="h-2 w-full bg-gradient-to-r from-red-500 via-orange-500 to-red-600"></div>
-
-    <main class="flex-1 flex flex-col items-center justify-center p-4 sm:p-8">
+    <!-- Background Elements -->
+    <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <!-- Light Mode Blob -->
+        <div class="absolute bg-blue-200 w-[600px] h-[600px] rounded-full blur-[100px] -top-20 -left-20 opacity-50 dark:hidden animate-float"></div>
+        <!-- Dark Mode Blobs -->
+        <div class="absolute bg-blue-600/20 w-[800px] h-[800px] rounded-full blur-[120px] -top-40 -left-20 hidden dark:block animate-pulse-slow"></div>
+        <div class="absolute bg-cyan-600/20 w-[600px] h-[600px] rounded-full blur-[120px] bottom-0 right-0 hidden dark:block animate-pulse-slow" style="animation-delay: 2s;"></div>
         
-        <!-- Error Container -->
-        <div class="max-w-3xl w-full bg-white shadow-2xl rounded-lg overflow-hidden border border-gray-200 animate-[fadeIn_0.5s_ease-out]">
+        <!-- Grid Pattern -->
+        <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150"></div>
+    </div>
+
+    <!-- Firebase Logic (Auth Only) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCQn051tbCb9AVL9S9okflhRFQq3_n5IR0",
+            authDomain: "yohan-h4x-7de1c.firebaseapp.com",
+            projectId: "yohan-h4x-7de1c",
+            storageBucket: "yohan-h4x-7de1c.firebasestorage.app",
+            messagingSenderId: "231546565624",
+            appId: "1:231546565624:web:0fe658a2196a05566f9c0d",
+            measurementId: "G-XT6RG3HDW9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        window.currentUserData = null;
+        let pendingCheckout = false; // Flag to track checkout attempt
+
+        window.loginWithGoogle = async () => {
+            try {
+                const result = await signInWithPopup(auth, provider);
+                window.closeLoginModal(); 
+                showToast(`Welcome, ${result.user.displayName.split(' ')[0]}!`);
+            } catch (error) {
+                console.error("Login Failed:", error);
+                alert(error.message);
+            }
+        };
+
+        window.logoutUser = async () => {
+            await signOut(auth);
+            showToast("Logged out successfully");
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            window.currentUserData = user;
+            updateAuthUI(user);
             
-            <!-- Header Section -->
-            <div class="bg-gray-900 p-8 text-center relative overflow-hidden">
-                <!-- Background Icon -->
-                <i class="fas fa-ban absolute text-gray-800 text-[12rem] -top-8 -right-8 opacity-20 transform rotate-12"></i>
+            // Redirect to Checkout if pending
+            if (user && pendingCheckout) {
+                pendingCheckout = false; // Reset flag
+                showToast("Login successful! Resuming checkout...");
+                setTimeout(() => {
+                    checkout(); // Re-trigger checkout
+                }, 800); // Slight delay for smoother UX
+            }
+        });
+
+        function updateAuthUI(user) {
+            const loginBtns = document.querySelectorAll('.auth-login-btn');
+            const profileSections = document.querySelectorAll('.auth-profile-section');
+            const userAvatars = document.querySelectorAll('.user-avatar-img');
+
+            if (user) {
+                loginBtns.forEach(btn => btn.classList.add('hidden'));
+                profileSections.forEach(sec => sec.classList.remove('hidden'));
+                userAvatars.forEach(img => img.src = user.photoURL || 'https://via.placeholder.com/40');
+                document.getElementById('profile-name').innerText = user.displayName;
+                document.getElementById('profile-email').innerText = user.email;
+                document.getElementById('profile-img-large').src = user.photoURL;
+                document.getElementById('profile-uid').innerText = 'ID: ' + user.uid.substring(0, 8) + '...';
+            } else {
+                loginBtns.forEach(btn => btn.classList.remove('hidden'));
+                profileSections.forEach(sec => sec.classList.add('hidden'));
+            }
+        }
+
+        // --- Donation & Cart Logic (Client Side) ---
+        window.startDonation = function() {
+            const modal = document.getElementById('buy-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                document.getElementById('modal-backdrop').classList.remove('opacity-0');
+                document.getElementById('modal-panel').classList.remove('scale-95', 'opacity-0');
+                document.getElementById('modal-panel').classList.add('scale-100', 'opacity-100');
+            }, 10);
+
+            document.getElementById('modal-loading').classList.remove('hidden');
+            document.getElementById('modal-success').classList.add('hidden');
+            document.querySelector('#modal-loading h3').textContent = "Creating Pledge...";
+
+            setTimeout(() => {
+                document.getElementById('modal-loading').classList.add('hidden');
+                document.getElementById('modal-success').classList.remove('hidden');
                 
-                <h1 class="text-7xl font-black text-white tracking-tighter mb-2 relative z-10">406</h1>
-                <h2 class="text-2xl font-bold text-red-500 uppercase tracking-widest relative z-10">Not Acceptable</h2>
-            </div>
+                document.getElementById('modal-title').textContent = "DONATION PLEDGE";
+                const pledgeId = '#DEV-' + Math.floor(1000 + Math.random() * 9000);
+                document.getElementById('order-id').textContent = pledgeId;
+                document.getElementById('modal-item-name').textContent = "Developer Support";
+                document.getElementById('modal-price').textContent = "150.RS";
+                
+                const waMessage = `Hi, I want to donate to the developer!\n\nPledge ID: ${pledgeId}\nAmount: 150.RS\n\nPlease send me payment details.`;
+                const waUrl = `https://wa.me/94774673989?text=${encodeURIComponent(waMessage)}`;
+                
+                const linkBtn = document.getElementById('wa-link');
+                linkBtn.href = waUrl;
+                linkBtn.className = "w-full inline-flex justify-center items-center rounded-lg bg-yellow-500 px-4 py-3 text-sm font-bold text-white hover:bg-yellow-600 transition uppercase shadow-lg shadow-yellow-500/30";
+                
+                window.location.href = waUrl;
+            }, 2000);
+        }
+    </script>
 
-            <!-- Content Section -->
-            <div class="p-8 sm:p-12">
-                <div class="flex items-start gap-6 mb-8">
-                    <div class="hidden sm:flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:h-10 sm:w-10">
-                        <i class="fas fa-exclamation-triangle text-red-600"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-bold text-gray-900">Project Handover Rejected</h3>
-                        <p class="mt-2 text-sm text-gray-500 leading-relaxed">
-                            The server (Owner) understands the request (Handover), but refuses to authorize it due to quality issues. The resource 'Project Omega' contains too many bugs.
-                        </p>
-                    </div>
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 bg-white/80 dark:bg-dark/80 backdrop-blur-md border-b border-gray-200 dark:border-white/5 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <div class="flex-shrink-0 cursor-pointer" onclick="switchView('home')">
+                    <span class="text-2xl font-black relative">
+                        <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-cyan-400">YOHAN H4X</span>
+                        <span class="text-blue-500">.</span>
+                    </span>
                 </div>
 
-                <!-- The "Message" Box -->
-                <div class="bg-red-50 border-l-4 border-red-500 p-6 rounded-r-md mb-8">
-                    <p class="text-xs font-bold text-red-800 uppercase mb-2 flex items-center gap-2">
-                        <i class="fas fa-user-tie"></i>
-                        Server Response (Owner):
-                    </p>
-                    <p class="text-2xl md:text-3xl font-bold text-gray-800 italic">
-                        "Ehenam ubama thiya ganim!"
-                    </p>
-                </div>
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex space-x-8 items-center">
+                    <button onclick="switchView('home')" class="text-gray-600 dark:text-gray-300 hover:text-blue-500 dark:hover:text-white transition-colors font-bold">Store</button>
+                    <button onclick="switchView('donate')" class="text-gray-600 dark:text-gray-300 hover:text-yellow-500 dark:hover:text-yellow-400 transition-colors font-bold">Donate</button>
+                    
+                    <!-- Theme Toggle -->
+                    <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors" onclick="toggleTheme()">
+                        <i class="fas fa-moon dark:hidden text-slate-600"></i>
+                        <i class="fas fa-sun hidden dark:inline text-yellow-400"></i>
+                    </button>
 
-                <!-- Technical Details Accordion -->
-                <div class="border rounded-md border-gray-200 bg-gray-50">
-                    <details class="group">
-                        <summary class="flex justify-between items-center font-medium cursor-pointer list-none p-4 text-sm text-gray-600 hover:text-gray-900 transition-colors">
-                            <span>View Technical Details</span>
-                            <span class="transition group-open:rotate-180">
-                                <i class="fas fa-chevron-down"></i>
-                            </span>
-                        </summary>
-                        <div class="text-xs border-t border-gray-200 p-4 bg-gray-900 text-green-400 mono overflow-x-auto">
-                            <p class="mb-1"><span class="text-gray-500">Timestamp:</span> <span id="time"></span></p>
-                            <p class="mb-1"><span class="text-gray-500">Request:</span> POST /api/v1/deliver-project</p>
-                            <p class="mb-1"><span class="text-gray-500">Status:</span> <span class="text-red-500">406 Not Acceptable</span></p>
-                            <p class="mb-1"><span class="text-gray-500">Error:</span> <span class="text-yellow-300">USER_SATISFACTION_UNDEFINED</span></p>
-                            <p class="mb-1"><span class="text-gray-500">Stack Trace:</span></p>
-                            <div class="pl-4 text-gray-400">
-                                at Developer.fixBugs (main.js:0)<br>
-                                at Developer.hopeForBest (main.js:99)<br>
-                                at Owner.review (office.js:404)<br>
-                                <span class="text-red-400">=> Error: "Thiya Ganim Exception" thrown.</span>
+                    <!-- Cart -->
+                    <button onclick="openCartModal()" class="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors group">
+                        <i class="fas fa-shopping-cart text-lg text-gray-600 dark:text-gray-300 group-hover:text-blue-500"></i>
+                        <span id="cart-count-desktop" class="absolute -top-1 -right-1 bg-blue-600 text-white text-xs font-bold h-5 w-5 flex items-center justify-center rounded-full opacity-0 transition-opacity">0</span>
+                    </button>
+
+                    <!-- Auth -->
+                    <div class="flex items-center ml-2">
+                        <button onclick="openLoginModal()" class="auth-login-btn bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full transition text-sm font-bold shadow-lg shadow-blue-500/20 transform hover:-translate-y-0.5">
+                            LOGIN
+                        </button>
+
+                        <div class="auth-profile-section hidden relative group">
+                            <button class="flex items-center space-x-2 focus:outline-none ring-2 ring-transparent group-hover:ring-blue-500 rounded-full transition-all">
+                                <img class="user-avatar-img w-9 h-9 rounded-full border border-blue-500" src="" alt="User">
+                            </button>
+                            <div class="absolute right-0 mt-4 w-56 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-700 rounded-xl shadow-2xl py-2 hidden group-hover:block transform origin-top-right transition-all">
+                                <div class="px-4 py-2 border-b border-gray-100 dark:border-slate-800">
+                                    <p class="text-xs text-gray-500">Signed in as</p>
+                                    <p class="text-sm font-bold truncate text-gray-900 dark:text-white" id="dropdown-email-preview">Member</p>
+                                </div>
+                                <button onclick="openProfileModal()" class="block w-full text-left px-4 py-3 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
+                                    <i class="fas fa-id-card mr-2 text-blue-500"></i> My Profile
+                                </button>
+                                <button onclick="logoutUser()" class="block w-full text-left px-4 py-3 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors">
+                                    <i class="fas fa-sign-out-alt mr-2 text-red-500"></i> Logout
+                                </button>
                             </div>
                         </div>
-                    </details>
+                    </div>
                 </div>
 
-                <!-- Footer Actions -->
-                <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                    <button onclick="window.location.reload()" class="px-6 py-3 bg-gray-900 hover:bg-gray-800 text-white font-semibold rounded-lg transition-all shadow-lg hover:shadow-xl text-sm">
-                        <i class="fas fa-sync-alt mr-2"></i> Try Again (Won't Work)
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center gap-4">
+                    <button onclick="openCartModal()" class="relative p-2">
+                        <i class="fas fa-shopping-cart text-lg text-gray-600 dark:text-gray-300"></i>
+                        <span id="cart-count-mobile" class="absolute -top-1 -right-1 bg-blue-600 text-white text-xs font-bold h-5 w-5 flex items-center justify-center rounded-full opacity-0 transition-opacity">0</span>
                     </button>
-                    <a href="#" class="px-6 py-3 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold rounded-lg transition-all text-center text-sm">
-                        <i class="fas fa-arrow-left mr-2"></i> Go Home
-                    </a>
+                    <button id="mobile-menu-btn" class="text-2xl text-gray-800 dark:text-white focus:outline-none">
+                        <i class="fas fa-bars"></i>
+                    </button>
                 </div>
-
-            </div>
-            
-            <!-- Footer Status Bar -->
-            <div class="bg-gray-100 px-8 py-3 border-t border-gray-200 flex justify-between items-center text-xs text-gray-500">
-                <span>Error Ref: ID-10-T</span>
-                <span>Powered by Bad Code &trade;</span>
             </div>
         </div>
 
-    </main>
+        <!-- Mobile Menu Panel -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white dark:bg-slate-900 border-t border-gray-100 dark:border-slate-800 absolute w-full shadow-xl z-40">
+            <div class="px-4 pt-2 pb-6 space-y-2">
+                <button onclick="switchView('home')" class="block w-full text-left px-3 py-3 rounded-md hover:bg-gray-50 dark:hover:bg-slate-800 font-bold text-gray-700 dark:text-gray-300">Store</button>
+                <button onclick="switchView('donate')" class="block w-full text-left px-3 py-3 rounded-md hover:bg-gray-50 dark:hover:bg-slate-800 font-bold text-gray-700 dark:text-gray-300">Donate</button>
+                
+                <!-- Theme Toggle Mobile -->
+                <button class="flex items-center w-full px-3 py-3 rounded-md hover:bg-gray-50 dark:hover:bg-slate-800 font-bold text-gray-700 dark:text-gray-300" onclick="toggleTheme()">
+                    <i class="fas fa-moon dark:hidden mr-3"></i>
+                    <i class="fas fa-sun hidden dark:inline text-yellow-400 mr-3"></i>
+                    <span>Toggle Theme</span>
+                </button>
+
+                <button onclick="openLoginModal()" class="auth-login-btn block w-full text-left px-3 py-3 rounded-md hover:bg-gray-50 dark:hover:bg-slate-800 font-bold text-blue-500">
+                    <i class="fas fa-user mr-2"></i> LOGIN
+                </button>
+                <div class="auth-profile-section hidden border-t border-gray-100 dark:border-slate-800 mt-2 pt-2">
+                    <button onclick="openProfileModal()" class="block w-full text-left px-3 py-3 rounded-md hover:bg-gray-50 dark:hover:bg-slate-800 font-bold text-gray-700 dark:text-gray-300">
+                        <i class="fas fa-id-card mr-2 text-blue-500"></i> View Profile
+                    </button>
+                    <button onclick="logoutUser()" class="block w-full text-left px-3 py-3 rounded-md hover:bg-gray-50 dark:hover:bg-slate-800 font-bold text-red-500">
+                        <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section (Added ID for Toggle) -->
+    <section id="hero" class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden z-10 transition-opacity duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <div class="inline-block px-4 py-1.5 rounded-full bg-blue-100 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 font-black text-sm mb-8 border border-blue-200 dark:border-blue-500/20 reveal animate-bounce">
+                OFFICIAL STORE
+            </div>
+            <h1 class="text-5xl md:text-8xl font-black tracking-tight mb-8 reveal uppercase">
+                <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500 dark:from-blue-500 dark:to-cyan-400">ANDROID & ISO</span> <br/>
+                <span class="text-slate-800 dark:text-white">PANEL STORE</span>
+            </h1>
+            <p class="mt-4 max-w-2xl mx-auto text-xl text-gray-600 dark:text-gray-400 reveal font-medium">
+                Premium secure panels with lifetime validity. <br>
+                <a href="https://www.youtube.com/@YOHAN_H4X" target="_blank" class="text-blue-500 font-black flex items-center justify-center gap-2 mt-2 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                    <i class="fab fa-youtube"></i> YOHAN H4X (10K+ SUBS)
+                </a>
+            </p>
+            <div class="mt-10 flex justify-center gap-4 reveal">
+                <a href="#store" class="bg-blue-600 text-white px-8 py-4 rounded-full font-black hover:bg-blue-700 transition shadow-lg shadow-blue-500/30 transform hover:-translate-y-1">
+                    VIEW STORE
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Store Section (Added transition for Toggle) -->
+    <section id="store" class="py-20 relative z-10 bg-white dark:bg-transparent transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-blue-500 font-black tracking-wide uppercase text-sm md:text-base">Premium Panels</h2>
+                <p class="mt-2 text-4xl font-black uppercase text-slate-900 dark:text-white">Choose Your Package</p>
+                <div class="w-24 h-1 bg-blue-600 mx-auto mt-4 rounded-full"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Product 1 (Basic - Blue Gradient) -->
+                <div class="glass-card p-6 rounded-2xl reveal relative border border-blue-500/30 dark:bg-gradient-to-br dark:from-blue-900/80 dark:to-slate-950 shadow-xl shadow-blue-500/10">
+                    <div class="absolute top-0 right-0 bg-blue-100 dark:bg-blue-950/50 px-3 py-1 text-xs font-bold rounded-bl-lg text-blue-600 dark:text-blue-300 border-l border-b border-blue-500/20">BASIC</div>
+                    <div class="h-14 w-14 bg-blue-100 dark:bg-blue-500/20 rounded-xl flex items-center justify-center mb-6 text-blue-500 dark:text-blue-300 shadow-inner ring-1 ring-blue-500/20">
+                        <i class="fas fa-crosshairs text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-black uppercase mb-2 text-slate-800 dark:text-white">Headshot 100/70</h3>
+                    <ul class="space-y-3 mb-8 text-sm text-gray-600 dark:text-gray-300 font-medium">
+                        <li class="flex items-center"><i class="fas fa-check-circle text-blue-500 mr-2"></i> Anti-Cheat</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-blue-500 mr-2"></i> Safe Main ID</li>
+                        <li class="flex items-center"><i class="fas fa-infinity text-blue-500 mr-2"></i> Lifetime</li>
+                    </ul>
+                    <div class="text-3xl font-black text-slate-900 dark:text-white mb-4">2200.RS</div>
+                    <button onclick="addToCart('Headshot 100/70', 2200)" class="w-full py-3 text-center rounded-xl bg-blue-500/10 border-2 border-blue-500 text-blue-600 dark:text-blue-300 font-bold hover:bg-blue-600 hover:text-white transition-all uppercase text-sm">
+                        Add to Cart
+                    </button>
+                </div>
+
+                <!-- Product 2 (Popular - Cyan Gradient) -->
+                <div class="glass-card p-6 rounded-2xl reveal relative border border-cyan-500/30 dark:bg-gradient-to-br dark:from-cyan-900/80 dark:to-slate-950 shadow-xl shadow-cyan-500/10">
+                    <div class="absolute top-0 right-0 bg-cyan-100 dark:bg-cyan-950/50 px-3 py-1 text-xs font-bold rounded-bl-lg text-cyan-600 dark:text-cyan-300 border-l border-b border-cyan-500/20">POPULAR</div>
+                    <div class="h-14 w-14 bg-cyan-100 dark:bg-cyan-500/20 rounded-xl flex items-center justify-center mb-6 text-cyan-500 dark:text-cyan-300 shadow-inner ring-1 ring-cyan-500/20">
+                        <i class="fas fa-skull text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-black uppercase mb-2 text-slate-800 dark:text-white">Headshot 100/85</h3>
+                    <ul class="space-y-3 mb-8 text-sm text-gray-600 dark:text-gray-300 font-medium">
+                        <li class="flex items-center"><i class="fas fa-check-circle text-cyan-500 mr-2"></i> High Accuracy</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-cyan-500 mr-2"></i> Anti-Cheat</li>
+                        <li class="flex items-center"><i class="fas fa-infinity text-cyan-500 mr-2"></i> Lifetime</li>
+                    </ul>
+                    <div class="text-3xl font-black text-slate-900 dark:text-white mb-4">3300.RS</div>
+                    <button onclick="addToCart('Headshot 100/85', 3300)" class="w-full py-3 text-center rounded-xl bg-cyan-500/10 border-2 border-cyan-500 text-cyan-600 dark:text-cyan-300 font-bold hover:bg-cyan-500 hover:text-white transition-all uppercase text-sm shadow-lg shadow-cyan-500/30">
+                        Add to Cart
+                    </button>
+                </div>
+
+                <!-- Product 3 (Ultimate - Indigo Gradient) -->
+                <div class="glass-card p-6 rounded-2xl reveal relative border border-indigo-500/30 dark:bg-gradient-to-br dark:from-indigo-900/80 dark:to-slate-950 shadow-xl shadow-indigo-500/10">
+                    <div class="absolute top-0 right-0 bg-indigo-100 dark:bg-indigo-950/50 px-3 py-1 text-xs font-bold rounded-bl-lg text-indigo-600 dark:text-indigo-300 border-l border-b border-indigo-500/20">ULTIMATE</div>
+                    <div class="h-14 w-14 bg-indigo-100 dark:bg-indigo-500/20 rounded-xl flex items-center justify-center mb-6 text-indigo-500 dark:text-indigo-300 shadow-inner ring-1 ring-indigo-500/20">
+                        <i class="fas fa-crown text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-black uppercase mb-2 text-slate-800 dark:text-white">Auto Headshot</h3>
+                    <ul class="space-y-3 mb-8 text-sm text-gray-600 dark:text-gray-400 font-medium">
+                        <li class="flex items-center"><i class="fas fa-check-circle text-indigo-500 mr-2"></i> Full Auto</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-indigo-500 mr-2"></i> Anti-Cheat MAX</li>
+                        <li class="flex items-center"><i class="fas fa-infinity text-indigo-500 mr-2"></i> Lifetime</li>
+                    </ul>
+                    <div class="text-3xl font-black text-slate-900 dark:text-white mb-4">5500.RS</div>
+                    <button onclick="addToCart('Auto Headshot', 5500)" class="w-full py-3 text-center rounded-xl bg-indigo-500/10 border-2 border-indigo-500 text-indigo-600 dark:text-indigo-300 font-bold hover:bg-indigo-500 hover:text-white transition-all uppercase text-sm shadow-lg shadow-indigo-500/30">
+                        Add to Cart
+                    </button>
+                </div>
+
+                <!-- Product 4 (New - Teal Gradient) -->
+                <div class="glass-card p-6 rounded-2xl reveal relative border border-teal-500/30 dark:bg-gradient-to-br dark:from-teal-900/80 dark:to-slate-950 shadow-xl shadow-teal-500/10">
+                    <div class="absolute top-0 right-0 bg-teal-100 dark:bg-teal-950/50 px-3 py-1 text-xs font-bold rounded-bl-lg text-teal-600 dark:text-teal-300 border-l border-b border-teal-500/20">NEW</div>
+                    <div class="h-14 w-14 bg-teal-100 dark:bg-teal-500/20 rounded-xl flex items-center justify-center mb-6 text-teal-500 dark:text-teal-300 shadow-inner ring-1 ring-teal-500/20">
+                        <i class="fas fa-biohazard text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-black uppercase mb-2 text-slate-800 dark:text-white">Blood Strike Mod</h3>
+                    <ul class="space-y-3 mb-8 text-sm text-gray-600 dark:text-gray-400 font-medium">
+                        <li class="flex items-center"><i class="fas fa-check-circle text-teal-500 mr-2"></i> Full Menu</li>
+                        <li class="flex items-center"><i class="fas fa-check-circle text-teal-500 mr-2"></i> Latest Version</li>
+                        <li class="flex items-center"><i class="fas fa-infinity text-teal-500 mr-2"></i> Lifetime</li>
+                    </ul>
+                    <div class="text-3xl font-black text-slate-900 dark:text-white mb-4">5500.RS</div>
+                    <button onclick="addToCart('Blood Strike Mod', 5500)" class="w-full py-3 text-center rounded-xl bg-teal-500/10 border-2 border-teal-500 text-teal-600 dark:text-teal-300 font-bold hover:bg-teal-500 hover:text-white transition-all uppercase text-sm">
+                        Add to Cart
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Donate Section (Hidden by Default) -->
+    <section id="donate" class="hidden py-32 relative z-10 min-h-screen">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="glass-card rounded-2xl p-8 md:p-12 text-center shadow-2xl border border-yellow-500/30">
+                <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-yellow-500 text-white px-6 py-2 rounded-full font-bold shadow-lg shadow-yellow-500/40 uppercase text-sm tracking-wider">
+                    Support the Dev
+                </div>
+                <h2 class="text-4xl font-black mb-6 text-slate-900 dark:text-white uppercase mt-4">Donate to Developer</h2>
+                <p class="text-gray-600 dark:text-gray-400 mb-10 font-medium text-lg">
+                    Help us keep the servers running and updates coming! Your support means the world.
+                </p>
+                
+                <div class="flex flex-col items-center justify-center mb-10">
+                    <div class="text-7xl font-black text-yellow-500 mb-2">150<span class="text-3xl text-gray-500">.RS</span></div>
+                    <div class="text-sm text-gray-400 uppercase font-bold tracking-widest">One-Time Donation</div>
+                </div>
+
+                <button onclick="startDonation()" class="inline-flex items-center justify-center bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-5 px-12 rounded-full transition shadow-lg shadow-yellow-500/30 w-full md:w-auto transform hover:scale-105 uppercase tracking-wide text-lg">
+                    <i class="fas fa-heart text-2xl mr-3 animate-pulse"></i> Donate Now
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 py-10 relative z-10 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+            <!-- Footer Logo (Updated) -->
+            <div class="text-xl font-black text-slate-800 dark:text-white">
+                <span class="text-blue-500">YOHAN</span> H4X.
+            </div>
+            <div class="text-gray-500 text-xs font-bold">&copy; 2023 YOHAN H4X YT. All rights reserved.</div>
+            <div class="flex space-x-6">
+                <a href="https://www.youtube.com/@YOHAN_H4X" target="_blank" class="text-gray-400 hover:text-blue-500 transition"><i class="fab fa-youtube text-2xl"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ========== MODALS ========== -->
+
+    <!-- Cart Modal -->
+    <div id="cart-modal" class="fixed inset-0 z-[60] hidden" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity opacity-0" id="cart-backdrop" onclick="closeCartModal()"></div>
+        <div class="absolute inset-y-0 right-0 max-w-md w-full flex pointer-events-none">
+            <div class="w-full h-full bg-white dark:bg-slate-900 shadow-2xl transform translate-x-full transition-transform duration-300 pointer-events-auto flex flex-col border-l border-gray-200 dark:border-slate-800" id="cart-panel">
+                <div class="px-6 py-4 border-b border-gray-200 dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-900">
+                    <h2 class="text-lg font-bold uppercase text-slate-800 dark:text-white">Your Cart</h2>
+                    <button onclick="closeCartModal()" class="text-gray-400 hover:text-blue-500 transition"><i class="fas fa-times text-xl"></i></button>
+                </div>
+                <div class="flex-1 overflow-y-auto p-6" id="cart-items-container">
+                    <div class="flex flex-col items-center justify-center h-full text-center text-gray-500" id="cart-empty-state">
+                        <i class="fas fa-shopping-basket text-4xl mb-4 opacity-30"></i>
+                        <p class="font-medium">Cart is empty.</p>
+                    </div>
+                    <div id="cart-items-list" class="space-y-3"></div>
+                </div>
+                <div class="px-6 py-6 border-t border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-900">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-gray-600 dark:text-gray-400 font-bold">Total:</span>
+                        <span class="text-2xl font-black text-blue-600 dark:text-blue-500" id="cart-total">0.RS</span>
+                    </div>
+                    <button id="checkout-btn" onclick="checkout()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed uppercase text-sm" disabled>Proceed to Checkout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="fixed inset-0 z-[80] hidden overflow-y-auto" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity opacity-0" id="login-backdrop" onclick="closeLoginModal()"></div>
+        <div class="flex min-h-full items-center justify-center p-4">
+            <div class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-slate-900 text-left shadow-2xl transition-all max-w-sm w-full scale-95 opacity-0 border border-gray-200 dark:border-slate-700" id="login-panel">
+                <div class="p-8 text-center">
+                    <div class="w-16 h-16 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center mx-auto mb-6 text-blue-600 dark:text-blue-500">
+                        <i class="fas fa-user text-2xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-black text-slate-900 dark:text-white mb-2 uppercase">Welcome Back</h2>
+                    <p class="text-gray-500 dark:text-gray-400 mb-8 text-sm">Sign in to access your account</p>
+                    <button onclick="loginWithGoogle()" class="w-full flex items-center justify-center gap-3 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-700 text-slate-700 dark:text-white font-bold py-3 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition text-sm shadow-sm">
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="w-5 h-5">
+                        Login with Google
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profile-modal" class="fixed inset-0 z-[85] hidden overflow-y-auto" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity opacity-0" id="profile-backdrop" onclick="closeProfileModal()"></div>
+        <div class="flex min-h-full items-center justify-center p-4">
+            <div class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-slate-900 text-left shadow-2xl transition-all max-w-md w-full scale-95 opacity-0 border border-gray-200 dark:border-slate-700" id="profile-panel">
+                <div class="bg-gray-50 dark:bg-slate-800 p-4 flex justify-end">
+                     <button onclick="closeProfileModal()" class="text-gray-400 hover:text-slate-800 dark:hover:text-white"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="px-8 pb-8 text-center -mt-10">
+                    <img id="profile-img-large" src="" alt="Profile" class="w-24 h-24 rounded-full border-4 border-white dark:border-slate-900 shadow-xl mx-auto bg-gray-200 dark:bg-slate-800">
+                    <h2 id="profile-name" class="text-xl font-bold text-slate-900 dark:text-white mt-4">User Name</h2>
+                    <p id="profile-email" class="text-gray-500 text-sm mb-2">user@example.com</p>
+                    <span id="profile-uid" class="inline-block px-2 py-1 bg-gray-100 dark:bg-slate-800 rounded text-xs text-blue-500 border border-gray-200 dark:border-slate-700">ID: ...</span>
+                    
+                    <button onclick="logoutUser(); closeProfileModal()" class="mt-6 w-full py-2 rounded-lg border border-red-500/50 text-red-500 text-sm font-bold hover:bg-red-50 dark:hover:bg-red-900/20 transition">
+                        Sign Out
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Buy/Checkout Modal -->
+    <div id="buy-modal" class="fixed inset-0 z-[70] hidden overflow-y-auto" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity opacity-0" id="modal-backdrop"></div>
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <div class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-slate-900 text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg scale-95 opacity-0 border border-gray-200 dark:border-slate-700" id="modal-panel">
+                <div class="p-8">
+                    <div id="modal-loading" class="text-center py-8">
+                        <div class="inline-block animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500 mb-4"></div>
+                        <h3 class="text-lg font-bold text-slate-800 dark:text-white">Processing...</h3>
+                    </div>
+                    <div id="modal-success" class="hidden text-center">
+                        <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/20 mb-4 text-blue-500"><i class="fas fa-check text-2xl"></i></div>
+                        <h3 class="text-xl font-black text-slate-800 dark:text-white mb-2 uppercase" id="modal-title">ORDER GENERATED</h3>
+                        
+                        <div class="bg-gray-50 dark:bg-slate-800 rounded-lg p-5 mb-6 text-left border border-gray-200 dark:border-slate-700">
+                            <div class="flex justify-between mb-2 pb-2 border-b border-gray-200 dark:border-slate-700">
+                                <span class="text-gray-500 text-xs font-bold uppercase">Order ID</span>
+                                <span class="text-blue-600 dark:text-blue-400 font-mono font-bold" id="order-id">...</span>
+                            </div>
+                            <div class="flex justify-between mb-2">
+                                <span class="text-gray-500 text-xs font-bold uppercase">Item</span>
+                                <span class="text-slate-800 dark:text-white font-bold text-sm" id="modal-item-name">...</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-500 text-xs font-bold uppercase">Total</span>
+                                <span class="font-bold text-slate-800 dark:text-white" id="modal-price">...</span>
+                            </div>
+                        </div>
+
+                        <a id="wa-link" href="#" target="_blank" class="w-full inline-flex justify-center items-center rounded-lg bg-blue-600 px-4 py-3 text-sm font-bold text-white hover:bg-blue-700 transition uppercase shadow-lg shadow-blue-500/30">
+                            <i class="fab fa-whatsapp text-lg mr-2"></i> Message on WhatsApp
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-slate-800 dark:text-white px-5 py-3 rounded-lg shadow-xl transform translate-y-20 opacity-0 transition-all duration-300 z-[90] flex items-center gap-3">
+        <i class="fas fa-check-circle text-blue-500"></i>
+        <span id="toast-msg" class="text-sm font-medium">Notification</span>
+    </div>
 
     <script>
-        // Set current timestamp
-        document.getElementById('time').textContent = new Date().toISOString();
+        // --- View Switching Logic ---
+        function switchView(view) {
+            const hero = document.getElementById('hero');
+            const store = document.getElementById('store');
+            const donate = document.getElementById('donate');
+            const menu = document.getElementById('mobile-menu');
+
+            if (view === 'donate') {
+                hero.classList.add('hidden');
+                store.classList.add('hidden');
+                donate.classList.remove('hidden');
+            } else {
+                hero.classList.remove('hidden');
+                store.classList.remove('hidden');
+                donate.classList.add('hidden');
+            }
+            
+            // Close mobile menu if open
+            if(!menu.classList.contains('hidden')) {
+                menu.classList.add('hidden');
+                document.querySelector('#mobile-menu-btn i').classList.remove('fa-times');
+                document.querySelector('#mobile-menu-btn i').classList.add('fa-bars');
+            }
+            
+            window.scrollTo(0,0);
+        }
+
+        // --- Theme Toggle Logic ---
+        const themeBtn = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Initialize Theme from LocalStorage or System Preference
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        } else {
+            html.classList.remove('dark');
+        }
+
+        function toggleTheme() {
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                html.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+        }
+
+        // --- Mobile Menu ---
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+        const icon = btn.querySelector('i');
+
+        btn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+            if(menu.classList.contains('hidden')){
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            } else {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            }
+        });
+
+        // --- Scroll Reveal ---
+        const revealElements = document.querySelectorAll('.reveal');
+        function checkReveal() {
+            const triggerBottom = window.innerHeight * 0.9;
+            revealElements.forEach(element => {
+                if (element.getBoundingClientRect().top < triggerBottom) element.classList.add('active');
+            });
+        }
+        window.addEventListener('scroll', checkReveal);
+        checkReveal();
+
+        // --- Toast ---
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => { toast.classList.add('translate-y-20', 'opacity-0'); }, 3000);
+        }
+
+        // --- Modals Logic ---
+        function toggleModal(id, show) {
+            const modal = document.getElementById(id + '-modal');
+            const backdrop = document.getElementById(id + '-backdrop');
+            const panel = document.getElementById(id + '-panel');
+            
+            if (show) {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    backdrop.classList.remove('opacity-0');
+                    if(id === 'cart') panel.classList.remove('translate-x-full');
+                    else { panel.classList.remove('scale-95', 'opacity-0'); panel.classList.add('scale-100', 'opacity-100'); }
+                }, 10);
+            } else {
+                backdrop.classList.add('opacity-0');
+                if(id === 'cart') panel.classList.add('translate-x-full');
+                else { panel.classList.remove('scale-100', 'opacity-100'); panel.classList.add('scale-95', 'opacity-0'); }
+                setTimeout(() => { modal.classList.add('hidden'); }, 300);
+            }
+        }
+
+        window.openCartModal = () => toggleModal('cart', true);
+        window.closeCartModal = () => toggleModal('cart', false);
+        window.openLoginModal = () => toggleModal('login', true);
+        window.closeLoginModal = () => toggleModal('login', false);
+        window.openProfileModal = () => { if(window.currentUserData) toggleModal('profile', true); };
+        window.closeProfileModal = () => toggleModal('profile', false);
+        window.closeBuyModal = () => toggleModal('modal', false);
+
+        // --- Checkout Logic ---
+        let cart = [];
+        function addToCart(name, price) {
+            cart.push({ name, price });
+            updateCartUI();
+            showToast("Added to cart");
+            document.getElementById('cart-count-desktop').classList.remove('opacity-0');
+            document.getElementById('cart-count-desktop').textContent = cart.length;
+            document.getElementById('cart-count-mobile').classList.remove('opacity-0');
+            document.getElementById('cart-count-mobile').textContent = cart.length;
+        }
+        function removeFromCart(index) { cart.splice(index, 1); updateCartUI(); }
+        function updateCartUI() {
+            const list = document.getElementById('cart-items-list');
+            const emptyState = document.getElementById('cart-empty-state');
+            const checkoutBtn = document.getElementById('checkout-btn');
+            list.innerHTML = '';
+            let total = 0;
+
+            if (cart.length === 0) {
+                emptyState.classList.remove('hidden');
+                checkoutBtn.disabled = true;
+                document.getElementById('cart-count-desktop').classList.add('opacity-0');
+                document.getElementById('cart-count-mobile').classList.add('opacity-0');
+            } else {
+                emptyState.classList.add('hidden');
+                checkoutBtn.disabled = false;
+                cart.forEach((item, index) => {
+                    total += item.price;
+                    list.innerHTML += `
+                        <div class="flex justify-between items-center bg-gray-50 dark:bg-slate-800 p-3 rounded-lg border border-gray-200 dark:border-slate-700">
+                            <div><div class="font-bold text-sm text-slate-800 dark:text-white">${item.name}</div><div class="text-xs text-gray-500">${item.price}.RS</div></div>
+                            <button onclick="removeFromCart(${index})" class="text-gray-400 hover:text-red-500 px-2"><i class="fas fa-trash-alt"></i></button>
+                        </div>`;
+                });
+            }
+            document.getElementById('cart-total').textContent = total + ".RS";
+        }
+
+        window.checkout = function() {
+            // Require Login for Purchase
+            if (!window.currentUserData) {
+                pendingCheckout = true; // Set pending flag
+                closeCartModal();
+                setTimeout(() => {
+                    openLoginModal();
+                    showToast("Please login to complete your purchase");
+                }, 300);
+                return;
+            }
+
+            closeCartModal();
+            let total = 0;
+            let itemNames = [];
+            cart.forEach(i => { total += i.price; itemNames.push(i.name); });
+            if(itemNames.length === 0) return;
+
+            const modal = document.getElementById('buy-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                document.getElementById('modal-backdrop').classList.remove('opacity-0');
+                document.getElementById('modal-panel').classList.remove('scale-95', 'opacity-0');
+                document.getElementById('modal-panel').classList.add('scale-100', 'opacity-100');
+            }, 300);
+
+            document.getElementById('modal-loading').classList.remove('hidden');
+            document.getElementById('modal-success').classList.add('hidden');
+            document.getElementById('modal-price').textContent = total + ".RS";
+            document.getElementById('modal-item-name').textContent = itemNames.join(', ');
+
+            setTimeout(() => {
+                document.getElementById('modal-loading').classList.add('hidden');
+                document.getElementById('modal-success').classList.remove('hidden');
+                const newOrderId = '#H4X-' + Math.floor(1000 + Math.random() * 9000);
+                document.getElementById('order-id').textContent = newOrderId;
+                document.getElementById('modal-title').textContent = "ORDER GENERATED";
+                
+                const waMessage = `Hello YOHAN H4X, I want to buy:\n${itemNames.join('\n')}\n\nOrder ID: ${newOrderId}\nTotal Price: ${total}.RS\nUser: ${window.currentUserData.displayName}`;
+                const waUrl = `https://wa.me/94742263408?text=${encodeURIComponent(waMessage)}`;
+                
+                const linkBtn = document.getElementById('wa-link');
+                linkBtn.href = waUrl;
+                linkBtn.className = "w-full inline-flex justify-center items-center rounded-lg bg-blue-600 px-4 py-3 text-sm font-bold text-white hover:bg-blue-700 transition uppercase shadow-lg shadow-blue-500/30";
+                
+                window.location.href = waUrl;
+            }, 2000);
+        }
+
+        window.startDonation = function() {
+            const modal = document.getElementById('buy-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                document.getElementById('modal-backdrop').classList.remove('opacity-0');
+                document.getElementById('modal-panel').classList.remove('scale-95', 'opacity-0');
+                document.getElementById('modal-panel').classList.add('scale-100', 'opacity-100');
+            }, 10);
+
+            document.getElementById('modal-loading').classList.remove('hidden');
+            document.getElementById('modal-success').classList.add('hidden');
+            document.querySelector('#modal-loading h3').textContent = "Creating Pledge...";
+
+            setTimeout(() => {
+                document.getElementById('modal-loading').classList.add('hidden');
+                document.getElementById('modal-success').classList.remove('hidden');
+                
+                document.getElementById('modal-title').textContent = "DONATION PLEDGE";
+                const pledgeId = '#DEV-' + Math.floor(1000 + Math.random() * 9000);
+                document.getElementById('order-id').textContent = pledgeId;
+                document.getElementById('modal-item-name').textContent = "Developer Support";
+                document.getElementById('modal-price').textContent = "150.RS";
+                
+                const waMessage = `Hi, I want to donate to the developer!\n\nPledge ID: ${pledgeId}\nAmount: 150.RS\n\nPlease send me payment details.`;
+                const waUrl = `https://wa.me/94774673989?text=${encodeURIComponent(waMessage)}`;
+                
+                const linkBtn = document.getElementById('wa-link');
+                linkBtn.href = waUrl;
+                linkBtn.className = "w-full inline-flex justify-center items-center rounded-lg bg-yellow-500 px-4 py-3 text-sm font-bold text-white hover:bg-yellow-600 transition uppercase shadow-lg shadow-yellow-500/30";
+                
+                window.location.href = waUrl;
+            }, 2000);
+        }
     </script>
 </body>
 </html>
