@@ -712,6 +712,16 @@
         }
 
         window.checkout = function() {
+            // Require Login for Purchase
+            if (!window.currentUserData) {
+                closeCartModal();
+                setTimeout(() => {
+                    openLoginModal();
+                    showToast("Please login to purchase items");
+                }, 300);
+                return;
+            }
+
             closeCartModal();
             let total = 0;
             let itemNames = [];
@@ -738,7 +748,7 @@
                 document.getElementById('order-id').textContent = newOrderId;
                 document.getElementById('modal-title').textContent = "ORDER GENERATED";
                 
-                const waMessage = `Hello YOHAN H4X, I want to buy:\n${itemNames.join('\n')}\n\nOrder ID: ${newOrderId}\nTotal Price: ${total}.RS`;
+                const waMessage = `Hello YOHAN H4X, I want to buy:\n${itemNames.join('\n')}\n\nOrder ID: ${newOrderId}\nTotal Price: ${total}.RS\nUser: ${window.currentUserData.displayName}`;
                 const waUrl = `https://wa.me/94742263408?text=${encodeURIComponent(waMessage)}`;
                 
                 const linkBtn = document.getElementById('wa-link');
